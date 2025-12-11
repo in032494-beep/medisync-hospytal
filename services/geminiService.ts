@@ -1,8 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Initialize the Gemini client
-// NOTE: In a real environment, ensure process.env.API_KEY is set.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Ensure apiKey is always a string to prevent instantiation errors.
+// If process.env.API_KEY is missing, it will default to empty string.
+// The API call will fail later with a clear error, but the app won't crash on load.
+const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) 
+  ? process.env.API_KEY 
+  : '';
+
+const ai = new GoogleGenAI({ apiKey });
 
 const SYSTEM_INSTRUCTION = `
 Anda adalah "Hospital System Coordinator (HSC)" atau Koordinator Pusat Sistem Rumah Sakit.
@@ -27,14 +33,20 @@ Gunakan Bahasa Indonesia yang formal namun ramah.
 
 export const sendMessageToGemini = async (userMessage: string): Promise<string> => {
   try {
-    const modelId = 'gemini-2.5-flash'; // Using Flash for speed and efficiency in this routing task
+    // Check for API key before calling
+    if (!apiKey) {
+      console.warn("API Key is missing.");
+      return "Maaf, konfigurasi sistem (API Key) belum terpasang. Mohon hubungi administrator.";
+    }
+
+    const modelId = 'gemini-2.5-flash'; 
     
     const response = await ai.models.generateContent({
       model: modelId,
       contents: userMessage,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.3, // Low temperature for consistent routing logic
+        temperature: 0.3, 
         maxOutputTokens: 250,
       }
     });
