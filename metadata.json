@@ -1,0 +1,5 @@
+{
+  "name": "Hospital System Coordinator (HSC)",
+  "description": "A smart AI coordinator for hospital management that routes patient queries to the appropriate department (Billing, Medical Records, Appointments, etc.) using Gemini 2.5 Flash.",
+  "requestFramePermissions": []
+}
